@@ -1,0 +1,11 @@
+{
+  "devDependencies": {
+    "@playwright/test": "^1.63.0"
+  },
+  "name": "babycare-web-validation",
+  "private": true,
+  "scripts": {
+    "test:e2e": "playwright test",
+    "check:web": "node --check web/app.js && node --check web/features.js"
+  }
+}

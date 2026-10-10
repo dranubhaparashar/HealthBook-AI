@@ -1,0 +1,47 @@
+# Render Blueprint: FastAPI backend on the FREE web-service plan (no card, no paid add-ons).
+# Free instances sleep after 15 idle minutes and share 750 instance-hours per month; the disk is ephemeral,
+# so documents live in the private Supabase bucket and the database in Supabase PostgreSQL.
+services:
+  - type: web
+    name: babycare-api
+    runtime: docker
+    plan: free
+    region: singapore          # closest free region to India; keep Supabase in ap-south-1 (Mumbai) or ap-southeast-1
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/health
+    autoDeployTrigger: commit
+    envVars:
+      - key: BABYCARE_ENV
+        value: production
+      - key: BABYCARE_STORAGE
+        value: supabase
+      - key: BABYCARE_DATA_DIR
+        value: /data               # scratch only (locks, temp); nothing durable is written here
+      - key: BABYCARE_RATE_LIMIT_STORE
+        value: memory              # one free instance: per-process limiter, no database write per request
+      - key: PYTHONUNBUFFERED
+        value: "1"
+      - key: BABYCARE_PUSH_ENABLED
+        value: "false"             # Expo push for the mobile app; enable only after device testing
+      - key: DATABASE_URL          # Supabase > Connect > Session pooler (IPv4), postgresql://postgres.<ref>:<pw>@aws-0-<region>.pooler.supabase.com:5432/postgres
+        sync: false
+      - key: BABYCARE_FERNET_KEY   # MUST equal the contents of private_data/file_crypt.key or existing records become unreadable
+        sync: false
+      - key: SUPABASE_URL          # https://<ref>.supabase.co
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY   # server-only secret; never in the web app or mobile app
+        sync: false
+      - key: SUPABASE_STORAGE_BUCKET
+        value: medical-documents
+      - key: BABYCARE_CORS_ORIGINS # https://<project>.web.app,https://<project>.firebaseapp.com
+        sync: false
+      - key: BABYCARE_SCHEDULER_KEY
+        generateValue: true        # copy into cron-job.org / Supabase pg_cron as the X-Scheduler-Key header
+      - key: BABYCARE_VAPID_PUBLIC_KEY   # python -m api.push_web generate
+        sync: false
+      - key: BABYCARE_VAPID_PRIVATE_KEY
+        sync: false
+      - key: BABYCARE_VAPID_CONTACT      # mailto:you@example.com (required by push services for abuse contact)
+        sync: false
+      - key: BABYCARE_VISION_URL   # optional paid AI vision stays OFF: leave empty
+        value: ""

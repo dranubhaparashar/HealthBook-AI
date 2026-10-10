@@ -1,0 +1,13 @@
+.git
+.venv
+.cache
+private_data
+node_modules
+mobile
+tests
+test-results
+graphify-out
+.env
+*.log
+*.enc
+*.sqlite3

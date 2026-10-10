@@ -1,0 +1,100 @@
+# CI on GitHub's free Actions minutes. Source code only: no medical data, no cloud secrets, no deploy keys in this repo.
+# Deploys happen from Render (auto-deploy on push) and `npx firebase-tools deploy` run locally by the owner.
+name: Validate BabyCare
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+jobs:
+  backend:
+    name: Backend tests (SQLite + PostgreSQL staging)
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    services:
+      postgres:
+        image: postgres:17
+        env: {POSTGRES_PASSWORD: ci, POSTGRES_USER: ci, POSTGRES_DB: ci}
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12', cache: pip}
+      - run: sudo apt-get update && sudo apt-get install -y tesseract-ocr
+      - run: pip install -r requirements.lock pip-audit
+      - run: python -m compileall -q api migrations scripts
+      - name: SQLite suite
+        run: python -m pytest -q
+        env: {BABYCARE_STORAGE: local}
+      - name: PostgreSQL staging suite (synthetic data)
+        run: python -m pytest -q --ignore=tests/test_migrations.py
+        env:
+          BABYCARE_STORAGE: local
+          BABYCARE_DB_SSLMODE: disable
+          BABYCARE_TEST_DATABASE_URL: postgresql+psycopg://ci:ci@localhost:5432/ci?sslmode=disable
+          BABYCARE_TEST_PG_URL: postgresql+psycopg://ci:ci@localhost:5432/ci?sslmode=disable
+      - run: pip-audit -r requirements.lock || true
+  web:
+    name: Web checks + browser specs
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12', cache: pip}
+      - uses: actions/setup-node@v4
+        with: {node-version: '20'}
+      - run: pip install -r requirements.lock
+      - name: JavaScript syntax
+        run: for f in web/*.js; do node --check "$f"; done
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: python scripts/browser_fixture.py
+      - run: npx playwright test
+        env: {CI: '1'}
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with: {name: playwright-results, path: test-results, retention-days: 7}
+  mobile:
+    name: Mobile typecheck + export build check
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    defaults: {run: {working-directory: mobile}}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '20'}
+      - run: npm ci
+      - run: npm run typecheck
+      - name: Expo export (bundles Android + iOS JS; no native build, no signing)
+        run: npx expo export --platform android --platform ios
+        env: {EXPO_PUBLIC_ENV: production, EXPO_PUBLIC_API_URL_PRODUCTION: 'https://example.invalid', CI: '1'}
+      - run: npm audit --omit=dev --audit-level=high || true
+  android-apk:
+    name: Android debug APK (artifact, unsigned debug key)
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    if: github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/main'
+    defaults: {run: {working-directory: mobile}}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '20'}
+      - uses: actions/setup-java@v5
+        with: {distribution: temurin, java-version: '17'}
+      # ubuntu-latest ships the Android SDK (ANDROID_HOME=/usr/local/lib/android/sdk) with licences accepted;
+      # Gradle downloads the exact platform/build-tools it needs.
+      - run: npm ci
+      - run: npx expo prebuild --platform android --no-install
+        env:
+          CI: '1'
+          EXPO_PUBLIC_ENV: production
+          EXPO_PUBLIC_API_URL_PRODUCTION: ${{ vars.BABYCARE_API_URL || 'https://example.invalid' }}
+      - run: cd android && ./gradlew assembleDebug --no-daemon
+        env:
+          EXPO_PUBLIC_ENV: production
+          EXPO_PUBLIC_API_URL_PRODUCTION: ${{ vars.BABYCARE_API_URL || 'https://example.invalid' }}
+      - uses: actions/upload-artifact@v4
+        with: {name: BabyCare-AI-debug.apk, path: mobile/android/app/build/outputs/apk/debug/app-debug.apk, retention-days: 30}

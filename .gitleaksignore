@@ -1,0 +1,6 @@
+# Reviewed false positives: synthetic test passwords and idempotency keys
+tests/test_api.py:generic-api-key:21
+tests/test_delivery_security.py:generic-api-key:73
+tests/test_lifetime.py:generic-api-key:82
+tests/test_lifetime.py:generic-api-key:83
+tests/test_cloud.py:generic-api-key:151

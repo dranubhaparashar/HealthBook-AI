@@ -1,0 +1,80 @@
+/* Lifetime Health page. Uses the workspace tokens; adds a small semantic palette for clinical status. */
+:root{--lh-fever:#b4553c;--lh-fever-soft:#f6e3dc;--lh-parent:#b78a2c;--lh-parent-soft:#f7ecd2;--lh-abx:#2f6f9f;--lh-abx-soft:#dfeaf4;--lh-iv:#5b4f9c;--lh-iv-soft:#e6e2f3;--lh-stay:#e8ebe6;--lh-ok:#2d7a57;--lh-ok-soft:#dcefe3;--lh-warn:#9a631b;--lh-r:#b4553c;--lh-s:#2d7a57;--lh-i:#9a631b}
+[data-theme=dark]{--lh-fever:#e08f78;--lh-fever-soft:#4a2f28;--lh-parent:#e0b462;--lh-parent-soft:#4a3d22;--lh-abx:#7fb0d8;--lh-abx-soft:#243747;--lh-iv:#a79be0;--lh-iv-soft:#332e4d;--lh-stay:#2b3a43;--lh-ok:#7dc39e;--lh-ok-soft:#24402f;--lh-warn:#e0b462;--lh-r:#e08f78;--lh-s:#7dc39e;--lh-i:#e0b462}
+.lh-hero{background:linear-gradient(135deg,#223d47,#3b746f);color:#fff;border-radius:18px;padding:30px 34px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px;align-items:center;margin-bottom:22px}
+.lh-hero h1{color:#fff9eb;font-family:Georgia,serif;font-weight:400;font-size:clamp(26px,2.6vw,38px);margin:8px 0 6px}
+.lh-hero p{color:#d6e1dd;max-width:640px;margin:0;font-size:14px}
+.lh-hero .eyebrow{color:#c7d6d4}
+.lh-hero-side{display:grid;gap:8px;text-align:right}
+.lh-hero-side b{font-size:34px;font-weight:500;line-height:1}
+.lh-hero-side span{font-size:12px;color:#c7d6d4}
+.lh-tabs{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 20px;border-bottom:1px solid var(--line);padding-bottom:10px}
+.lh-tab{border:1px solid transparent;background:transparent;color:var(--muted);padding:9px 14px;border-radius:999px;font:600 13px inherit;cursor:pointer}
+.lh-tab.active{background:var(--light);color:var(--brand);border-color:var(--line)}
+.lh-tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:22px}
+.lh-tile{text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px 18px 14px;cursor:pointer;color:var(--ink);box-shadow:var(--shadow);display:grid;gap:6px;min-height:128px;transition:transform .15s}
+.lh-tile:hover{transform:translateY(-2px);border-color:var(--brand)}
+.lh-tile .lh-value{font-size:36px;font-weight:500;line-height:1}
+.lh-tile .lh-label{font-size:12px;font-weight:700;letter-spacing:.9px;text-transform:uppercase;color:var(--muted)}
+.lh-tile .lh-sub{font-size:12px;color:var(--muted)}
+.lh-tile .lh-verified{font-size:11px;color:var(--lh-ok);font-weight:700}
+.lh-tile .lh-pending{font-size:11px;color:var(--lh-warn);font-weight:700}
+.lh-grid2{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(300px,1fr);gap:18px}
+.lh-grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.lh-metric{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:14px;display:grid;gap:4px;cursor:pointer;text-align:left;color:var(--ink)}
+.lh-metric b{font-size:26px;font-weight:500}
+.lh-metric span{font-size:12px;color:var(--muted)}
+.lh-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:4px 9px;border-radius:999px;background:var(--light);color:var(--brand);white-space:nowrap}
+.lh-badge.fever{background:var(--lh-fever-soft);color:var(--lh-fever)}.lh-badge.parent{background:var(--lh-parent-soft);color:var(--lh-parent)}.lh-badge.abx{background:var(--lh-abx-soft);color:var(--lh-abx)}.lh-badge.iv{background:var(--lh-iv-soft);color:var(--lh-iv)}.lh-badge.ok{background:var(--lh-ok-soft);color:var(--lh-ok)}.lh-badge.warn{background:#fbf1dc;color:var(--lh-warn)}[data-theme=dark] .lh-badge.warn{background:#4a3d22}.lh-badge.gray{background:var(--lh-stay);color:var(--muted)}
+.lh-episode{border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:12px;background:var(--surface);display:grid;gap:8px}
+.lh-episode h3{margin:0;font-size:16px}
+.lh-episode .lh-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.lh-kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px 16px;font-size:13px}
+.lh-kv div span{display:block;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;font-weight:700}
+.lh-cal{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px}
+.lh-month{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px}
+.lh-month h4{margin:0 0 6px;font-size:12px;color:var(--muted);letter-spacing:.6px;text-transform:uppercase}
+.lh-days{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.lh-day{aspect-ratio:1;border-radius:6px;font-size:10px;display:grid;place-items:center;color:var(--muted);background:var(--bg);border:0;cursor:default;position:relative;padding:0}
+.lh-day.stay{background:var(--lh-stay)}
+.lh-day.fever{background:var(--lh-fever);color:#fff;cursor:pointer;font-weight:700}
+.lh-day.fever.approx{background:repeating-linear-gradient(45deg,var(--lh-fever),var(--lh-fever) 3px,var(--lh-fever-soft) 3px,var(--lh-fever-soft) 6px);color:var(--ink)}
+.lh-day.parent{background:var(--lh-parent);color:#fff;cursor:pointer;font-weight:700}
+.lh-day.abx:after{content:'';position:absolute;left:3px;right:3px;bottom:2px;height:3px;border-radius:2px;background:var(--lh-abx)}
+.lh-day.birth{outline:2px solid var(--brand)}
+.lh-legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin:10px 0 16px;align-items:center}
+.lh-legend i{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:middle;margin-right:5px}
+.lh-chart{width:100%;height:auto;display:block;font-family:inherit}
+.lh-chart text{fill:var(--ink);font-size:11px}
+.lh-chart .axis{stroke:var(--line)}
+.lh-chart .muted{fill:var(--muted)}
+.lh-bar-link{cursor:pointer}
+.lh-gantt-row{font-size:12px}
+.lh-table{width:100%;border-collapse:collapse;font-size:13px}
+.lh-table th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);padding:10px 8px;border-bottom:1px solid var(--line)}
+.lh-table td{padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+.lh-table tr:last-child td{border-bottom:0}
+.lh-evidence-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px}
+.lh-evidence-grid img{width:100%;border:1px solid var(--line);border-radius:10px;background:#eee;max-height:70vh;object-fit:contain}
+.lh-quote{border-left:3px solid var(--brand);padding:8px 12px;margin:10px 0;background:var(--bg);border-radius:0 10px 10px 0;font-size:13px}
+.lh-quote small{display:block;color:var(--muted);margin-top:4px}
+.lh-steps{position:relative;padding-left:26px}
+.lh-steps:before{content:'';position:absolute;left:9px;top:6px;bottom:6px;width:2px;background:var(--line)}
+.lh-step{position:relative;padding:8px 0 8px 10px;font-size:13px}
+.lh-step:before{content:'';position:absolute;left:-22px;top:13px;width:12px;height:12px;border-radius:50%;background:var(--surface);border:2px solid var(--brand)}
+.lh-step.fever_onset:before{border-color:var(--lh-fever);background:var(--lh-fever)}
+.lh-step.medication_prescribed:before{border-color:var(--lh-abx)}
+.lh-step.documented_administration:before,.lh-step.documented_administration_start:before{border-color:var(--lh-abx);background:var(--lh-abx)}
+.lh-step.laboratory_test:before{border-color:var(--lh-iv)}
+.lh-step .lh-when{font-weight:700;margin-right:8px}
+.lh-sus{display:flex;flex-wrap:wrap;gap:5px}
+.lh-sus span{font-size:11px;padding:3px 8px;border-radius:999px;border:1px solid var(--line)}
+.lh-sus .S{background:var(--lh-ok-soft);color:var(--lh-s)}.lh-sus .R{background:var(--lh-fever-soft);color:var(--lh-r)}.lh-sus .I{background:var(--lh-parent-soft);color:var(--lh-i)}
+.lh-flag{border:1px solid #e8dbc3;background:#fbf4e8;color:#796444;border-radius:10px;padding:10px 12px;font-size:12px;margin:6px 0}
+[data-theme=dark] .lh-flag{background:#393a2f;color:#e1d3b8;border-color:#595442}
+.lh-caption{font-size:12px;color:var(--muted);margin:6px 0 0}
+.lh-section{margin-top:22px}
+.lh-check{display:flex;gap:10px;align-items:flex-start;font-size:13px;margin:14px 0}
+.lh-check input{width:18px;height:18px;flex:none}
+@media(max-width:1050px){.lh-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}.lh-grid2,.lh-grid3{grid-template-columns:1fr}}
+@media(max-width:720px){.lh-hero{grid-template-columns:1fr;padding:22px}.lh-hero-side{text-align:left;grid-auto-flow:column;justify-content:start;gap:18px}.lh-tiles{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.lh-tile .lh-value{font-size:28px}.lh-evidence-grid{grid-template-columns:1fr}.lh-cal{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}.lh-tab{padding:8px 11px;font-size:12px}}

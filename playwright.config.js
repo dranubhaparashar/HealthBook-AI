@@ -1,0 +1,2 @@
+const {defineConfig}=require('@playwright/test');
+module.exports=defineConfig({testDir:'./tests/browser',timeout:45000,workers:1,use:{baseURL:process.env.BABYCARE_TEST_URL||'http://127.0.0.1:8000',browserName:'chromium',headless:true,trace:'retain-on-failure'},reporter:'list',...(process.env.CI?{webServer:{command:'python -m uvicorn api.main:app --host 127.0.0.1 --port 8000 --no-access-log',url:'http://127.0.0.1:8000/api/health',env:{BABYCARE_DATA_DIR:'.cache/browser-validation'},reuseExistingServer:false,timeout:30000}}:{})});

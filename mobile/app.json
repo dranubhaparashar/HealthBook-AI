@@ -1,0 +1,35 @@
+{
+  "expo": {
+    "name": "HealthBook AI",
+    "slug": "babycare-ai",
+    "scheme": "babycareai",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.example.babycareai"
+    },
+    "android": {
+      "package": "com.example.babycareai",
+      "permissions": [
+        "CAMERA",
+        "POST_NOTIFICATIONS"
+      ]
+    },
+    "plugins": [
+      "expo-secure-store",
+      "expo-document-picker",
+      [
+        "expo-image-picker",
+        {
+          "cameraPermission": "Allow HealthBook AI to scan medical documents."
+        }
+      ],
+      "expo-notifications"
+    ],
+    "experiments": {
+      "tsconfigPaths": true
+    }
+  }
+}
